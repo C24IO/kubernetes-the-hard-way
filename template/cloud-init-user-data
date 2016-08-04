@@ -1,0 +1,201 @@
+#cloud-config
+
+#If this is not explicitly false, cloud-init will change things so that root
+#login via ssh is disabled. If you don't want it to do anything, set it false.
+disable_root: false
+
+hostname: node0
+fqdn: node0.24.io
+
+# boot commands
+# default: none
+# this is very similar to runcmd, but commands run very early
+# in the boot process, only slightly after a 'boothook' would run.
+# bootcmd should really only be used for things that could not be
+# done later in the boot process.  bootcmd is very much like
+# boothook, but possibly with more friendly.
+# - bootcmd will run on every boot
+# - the INSTANCE_ID variable will be set to the current instance id.
+# - you can use 'cloud-init-boot-per' command to help only run once
+
+#As you can see above, there are two ways to write the commands. You can either provide them comma separated list.
+#bootcmd:
+# - echo worker1 > /etc/hostname
+# - [ cloud-init-per, once, mymkfs, mkfs, /dev/vdb ]
+
+#cloud-config
+
+# run commands
+# default: none
+# runcmd contains a list of either lists or a string
+# each item will be executed in order at rc.local like level with
+# output to the console
+# - runcmd only runs during the first boot
+# - if the item is a list, the items will be properly executed as if
+#   passed to execve(3) (with the first arg as the command).
+# - if the item is a string, it will be simply written to the file and
+#   will be interpreted by 'sh'
+#
+# Note, that the list has to be proper yaml, so you have to quote
+# any characters yaml would eat (':' can be problematic)
+runcmd:
+ - [ ls, -l, / ]
+ - [ sh, -xc, "echo $(date) ': hello world!'" ]
+ - [ sh, -c, echo "=========hello world'=========" ]
+ - ls -l /root
+ - history >> ~/HISTORY
+# - [ wget, "http://slashdot.org", -O, /tmp/index.html ]
+
+# add each entry to ~/.ssh/authorized_keys for the configured user or the
+# first user defined in the user definition directive.
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAEAQDBLqpsF4C+xN69zOCMkLAtCRA+cI0suAywhIsi3ivZOQDOEcGuegVDl3Kg8tRhCt3Y7Q7OcS0IeggY9kZdXP7hG2xJajaNMSkWU0u5Zk0/Rs1wBN2vMPwW2Gqq1lfaH9s1gGrvDyqBvl9bfDEyQHhTZaGc5EfVK/4xb7unUzq9KegqD3IjPmNz58zdGW2nJvEUh6KHhfUdnJAvGcUbjyE0avZ6hpoagVC8pEERP89Licw2etwpKMT9qy1oiH2LlFjAdTg2N7s9cA3Xj5brV5cIRDjFRYtnd+Uaq97kZXnYwKEx8uIIMtqkD+1TBQU0g8+YEYGhXonUDr8kMh36FK0P1NYhQzOoJxu8fxlhQfthNU+XaDnwl6uM8KxbMhSbBOCSZHvNX0QP3SGpaSD3Ub3YT5ksRqrLSJ0SpNDlqF3JfblXmyEl9xskN6wXrnVOOHGVkMnXLN378V6XGBXGojAZvMIiLKwDtRqcFHSO9BhQrIT9MWZxMTkMlDBMUyYY+4TwldCBYMJ5BgHfZr6hV/0n3dZnbSqs9KjVIdeb6DczYaulstr+4PRVeHpDxEiOeQgu9eY0iNNaHOzxiJZHj2MMjXpuJgMgJGEuACMn1BqFSTQCZECceYBX6dFS5n5nid+RmHY/dOZhn49M/z5HqANZ5fRrCXN4F7oc0Qs4DXr0y+3RsXwXtYCEn1oqpfqwqI/SJFqbKaYpjSNWPxqmJT2mbMPcKzy/M9uoY/5cYfj1biDWHU2hrybx6muqtbXsmiKXNwhzwmCtMUGxZsKDFYpX0SDrtEUEwpcvUiJtFweU9PpMSTwJxiOpk1pWR0hOrM0x07IsziqiabeSlephkhth70U7lAQNvQRbbl1P2I703aERkwERUlHVyUYTcc8iKANRngrhCvBI+1F2o+1ZeHy/TVKgHUSEtYpLWasq6BIYi2DP/XoE2Jj2iKTdkdcVPYVzOcIT9KZHjSwkV7PJ485Eib2cswzOr8EUmYfedRpeycn8DMGu9WNW03QEgnVTVCRwwlkPyTD2o8J8GKJSCGVNQzEOgspWV7cuFWmzbGnugf9BpWswPA/Cees02lMZ+Ilp4o+sa26+IU/anyVpFkSJvBHlKK22gwbxLruw0N9DlrlvH8FQZtdoP9FTwr5oldd44oMPz/8Y680+VcGcxnH1ySt8/D8/Zx68uoYtRQC10KqsL/eJb/f2HvfA7DewV7yzraR2XgFTikyKgC3AZbsjsVhKtFtbzuxmbTjCZ0gOxWM0xQaWLHQRC30BGgL5X3F1awsU+YIju1JUFgnyuyQC2Xt91D4fNSWGwfciC3yvx1bFjbMzZG5ns4mBLOvTaJq4T5t2jNV62YQCyyp4wANn root@keymaster
+
+# Update apt database on first boot
+# (ie run apt-get update)
+#
+# Default: true
+# Aliases: apt_update
+package_update: true
+
+# Upgrade the instance on first boot
+# (ie run apt-get upgrade)
+#
+# Default: false
+# Aliases: apt_upgrade
+package_upgrade: true
+
+# Reboot after package install/update if necessary
+# Default: false
+# Aliases: apt_reboot_if_required
+package_reboot_if_required: true
+
+packages:
+ - pwgen
+ - build-essential
+ - screen
+ - vim
+ - zsh
+
+# resize_rootfs should the / filesytem be resized on first boot
+# this allows you to launch an instance with a larger disk / partition
+# and have the instance automatically grow / to accomoddate it
+# set to 'False' to disable
+# by default, the resizefs is done early in boot, and blocks
+# if resize_rootfs is set to 'noblock', then it will be run in parallel
+resize_rootfs: True
+
+# configure where output will go
+# 'output' entry is a dict with 'init', 'config', 'final' or 'all'
+# entries.  Each one defines where 
+#  cloud-init, cloud-config, cloud-config-final or all output will go
+# each entry in the dict can be a string, list or dict.
+#  if it is a string, it refers to stdout and stderr
+#  if it is a list, entry 0 is stdout, entry 1 is stderr
+#  if it is a dict, it is expected to have 'output' and 'error' fields
+# default is to write to console only
+# the special entry "&1" for an error means "same location as stdout"
+#  (Note, that '&1' has meaning in yaml, so it must be quoted)
+output:
+ init: "> /var/log/my-cloud-init.log"
+ config: [ ">> /tmp/foo.out", "> /tmp/foo.err" ]
+ final:
+   output: "| tee /tmp/final.stdout | tee /tmp/bar.stdout"
+   error: "&1"
+
+# timezone: set the timezone for this instance
+# the value of 'timezone' must exist in /usr/share/zoneinfo
+timezone: America/Los_Angeles
+
+# def_log_file and syslog_fix_perms work together
+# if 
+# - logging is set to go to a log file 'L' both with and without syslog
+# - and 'L' does not exist
+# - and syslog is configured to write to 'L'
+# then 'L' will be initially created with root:root ownership (during
+# cloud-init), and then at cloud-config time (when syslog is available)
+# the syslog daemon will be unable to write to the file.
+# 
+# to remedy this situation, 'def_log_file' can be set to a filename
+# and syslog_fix_perms to a string containing "<user>:<group>"
+# if syslog_fix_perms is a list, it will iterate through and use the
+# first pair that does not raise error.
+#
+# the default values are '/var/log/cloud-init.log' and 'syslog:adm'
+# the value of 'def_log_file' should match what is configured in logging
+# if either is empty, then no change of ownership will be done
+def_log_file: /var/log/my-logging-file.log
+syslog_fix_perms: syslog:root
+
+# you can set passwords for a user or multiple users
+# this is off by default.
+# to set the default user's password, use the 'password' option.
+# if set, to 'R' or 'RANDOM', then a random password will be
+# generated and written to stdout (the console)
+# password: passw0rd
+#
+# also note, that this will expire the password, forcing a change
+# on first login. If you do not want to expire, see 'chpasswd' below.
+#
+# By default in the UEC images password authentication is disabled
+# Thus, simply setting 'password' as above will only allow you to login
+# via the console.
+#
+# in order to enable password login via ssh you must set
+# 'ssh_pwauth'.
+# If it is set, to 'True' or 'False', then sshd_config will be updated
+# to ensure the desired function.  If not set, or set to '' or 'unchanged'
+# then sshd_config will not be updated.
+# ssh_pwauth: True
+#
+# there is also an option to set multiple users passwords, using 'chpasswd'
+# That looks like the following, with 'expire' set to 'True' by default.
+# to not expire users passwords, set 'expire' to 'False':
+# chpasswd:
+#  list: |
+#    user1:password1
+#    user2:RANDOM
+#  expire: True
+# ssh_pwauth: [ True, False, "" or "unchanged" ]
+#
+# So, a simple working example to allow login via ssh, and not expire
+# for the default user would look like:
+password: c
+chpasswd: { expire: False }
+ssh_pwauth: True
+
+## poweroff or reboot system after finished
+# default: none
+#
+# power_state can be used to make the system shutdown, reboot or
+# halt after boot is finished.  This same thing can be acheived by
+# user-data scripts or by runcmd by simply invoking 'shutdown'.
+# 
+# Doing it this way ensures that cloud-init is entirely finished with
+# modules that would be executed, and avoids any error/log messages
+# that may go to the console as a result of system services like
+# syslog being taken down while cloud-init is running.
+#
+# delay: form accepted by shutdown.  default is 'now'. other format
+#        accepted is +m (m in minutes)
+# mode: required. must be one of 'poweroff', 'halt', 'reboot'
+# message: provided as the message argument to 'shutdown'. default is none.
+power_state:
+# delay: +1m
+ mode: reboot
+ message: Bye Bye Birdie
+
+# phone_home: if this dictionary is present, then the phone_home
+# cloud-config module will post specified data back to the given
+# url
+# default: none
+# phone_home:
+#  url: http://my.foo.bar/$INSTANCE/
+#  post: all
+#  tries: 10
+#
+phone_home:
+ url: http://10.10.10.105:8000/$INSTANCE_ID/
+ post: [ pub_key_dsa, pub_key_rsa, pub_key_ecdsa, instance_id ]
+
+final_message: "The system is finally up, after $UPTIME seconds"
