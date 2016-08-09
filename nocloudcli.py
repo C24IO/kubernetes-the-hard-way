@@ -7,6 +7,7 @@ from xml.dom import minidom
 import os
 import uuid
 import random
+import urllib
 
 """
 
@@ -30,10 +31,11 @@ with process.stdout:
     returncode = process.wait()
 
 """
-"""
-Image location - wget -cv https://cloud-images.ubuntu.com/yakkety/current/yakkety-server-cloudimg-amd64.img
-
-"""
+original_disk_image = 'yakkety-server-cloudimg-amd64.orig.img'
+if not os.path.isfile(original_disk_image):
+    print 'File ' + original_disk_image + ' not found, downloading....'
+    image_location = 'https://cloud-images.ubuntu.com/yakkety/current/yakkety-server-cloudimg-amd64.img'
+    urllib.urlretrieve (image_location, original_disk_image)
 
 def execute_command(command_string='ls'):
 
@@ -82,14 +84,13 @@ for vm in tesbed_vms:
                 input_data = input_data.replace(key, value)
 
             new_main.write(input_data)
-    """
+
     command_string = "cloud-localds cloud-init-user-data-seed-" + vm + ".img " + "cloud-init-user-data-" + vm
     execute_command(command_string)
     command_string = "qemu-img convert yakkety-server-cloudimg-amd64.orig.img " + " yakkety-server-cloudimg-amd64-" + vm + ".raw"
     execute_command(command_string)
     command_string = "qemu-img resize -f raw yakkety-server-cloudimg-amd64-" + vm + ".raw +15G"
     execute_command(command_string)
-    """
 
     xmldoc = minidom.parse(template_file_dict['template'])
     itemlist = xmldoc.getElementsByTagName('source')
@@ -111,3 +112,8 @@ for vm in tesbed_vms:
     file_handle = open(template_file_dict['template-new'],"wb")
     xmldoc.writexml(file_handle)
     file_handle.close()
+
+    command_string = 'virsh create yakkety-64-c-init-' + vm + '.xml'
+    execute_command(command_string)
+
+    print 'All Done !'
