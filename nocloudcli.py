@@ -30,6 +30,10 @@ with process.stdout:
     returncode = process.wait()
 
 """
+"""
+Image location - wget -cv https://cloud-images.ubuntu.com/yakkety/current/yakkety-server-cloudimg-amd64.img
+
+"""
 
 def execute_command(command_string='ls'):
 
